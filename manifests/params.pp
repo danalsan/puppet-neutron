@@ -29,6 +29,7 @@ class neutron::params {
   $vpnaas_agent_service        = 'neutron-vpn-agent'
   $l3_agent_service            = 'neutron-l3-agent'
   $metadata_agent_service      = 'neutron-metadata-agent'
+  $ovn_metadata_agent_service  = 'networking-ovn-metadata-agent'
   $bagpipe_bgp_package         = 'openstack-bagpipe-bgp'
   $bgpvpn_bagpipe_package      = 'python-networking-bagpipe'
   $bgpvpn_bagpipe_service      = 'bagpipe-bgp'
@@ -100,6 +101,7 @@ class neutron::params {
     $openswan_package           = 'openswan'
     $libreswan_package          = false
     $metadata_agent_package     = 'neutron-metadata-agent'
+    $ovn_metadata_agent_package = 'networking-ovn-metadata-agent'
     $l3_agent_package           = 'neutron-l3-agent'
     $fwaas_package              = 'python-neutron-fwaas'
     $l2gw_agent_package         = 'neutron-l2gateway-agent'
