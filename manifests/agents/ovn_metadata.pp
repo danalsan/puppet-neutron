@@ -52,11 +52,37 @@
 #   (optional) Allow to perform insecure SSL (https) requests to nova metadata.
 #   Defaults to $::os_service_default
 #
+# [*ovsdb_connection*]
+#   (optional) The URI used to connect to the local OVSDB server
+#   Defaults to $::os_service_default
+#
+# [*ovn_sb_connection*]
+#   (optional) The connection string for the OVN_Southbound OVSDB
+#   Defaults to '$::os_service_default'
+#
+# [*ovsdb_connection_timeout*]
+#   (optional) Timeout in seconds for the OVSDB connection transaction
+#   Defaults to $::os_service_default
+#
+# [*root_helper*]
+#  (optional) Use "sudo neutron-rootwrap /etc/neutron/rootwrap.conf" to use the real
+#  root filter facility. Change to "sudo" to skip the filtering and just run the command
+#  directly
+#  Defaults to 'sudo neutron-rootwrap /etc/neutron/rootwrap.conf'.
+#
+# [*root_helper_daemon*]
+#  (optional) Root helper daemon application to use when possible.
+#  Defaults to $::os_service_default.
+#
+# [*state_path*]
+#   (optional) Where to store state files. This directory must be writable
+#   by the user executing the agent
+#   Defaults to: '/var/lib/neutron'.
+#
 # [*purge_config*]
 #   (optional) Whether to set only the specified config options
 #   in the metadata config.
 #   Defaults to false.
-#
 
 class neutron::agents::ovn_metadata (
   $shared_secret,
@@ -77,6 +103,7 @@ class neutron::agents::ovn_metadata (
   $ovn_sb_connection         = $::os_service_default,
   $ovsdb_connection_timeout  = $::os_service_default,
   $root_helper               = 'sudo neutron-rootwrap /etc/neutron/rootwrap.conf',
+  $root_helper_daemon        = $::os_service_default,
   $state_path                = '/var/lib/neutron',
   $purge_config              = false,
   ) {
@@ -101,6 +128,7 @@ class neutron::agents::ovn_metadata (
     'DEFAULT/nova_client_cert':               value => $nova_client_cert;
     'DEFAULT/nova_client_priv_key':           value => $nova_client_priv_key;
     'DEFAULT/state_path':                     value => $state_path;
+    'agent/root_helper':                      value => $root_helper;
     'agent/root_helper_daemon':               value => $root_helper_daemon;
     'ovs/ovsdb_connection':                   value => $ovsdb_connection;
     'ovs/ovsdb_connection_timeout':           value => $ovsdb_connection_timeout;
