@@ -54,7 +54,7 @@
 #
 # [*ovsdb_connection*]
 #   (optional) The URI used to connect to the local OVSDB server
-#   Defaults to $::os_service_default
+#   Defaults to 'tcp:127.0.0.1:6640'
 #
 # [*ovn_sb_connection*]
 #   (optional) The connection string for the OVN_Southbound OVSDB
@@ -99,7 +99,7 @@ class neutron::agents::ovn_metadata (
   $metadata_insecure         = $::os_service_default,
   $nova_client_cert          = $::os_service_default,
   $nova_client_priv_key      = $::os_service_default,
-  $ovsdb_connection          = $::os_service_default,
+  $ovsdb_connection          = 'tcp:127.0.0.1:6640',
   $ovn_sb_connection         = $::os_service_default,
   $ovsdb_connection_timeout  = $::os_service_default,
   $root_helper               = 'sudo neutron-rootwrap /etc/neutron/rootwrap.conf',
@@ -156,5 +156,25 @@ class neutron::agents::ovn_metadata (
     name   => $::neutron::params::ovn_metadata_agent_service,
     enable => $enabled,
     tag    => 'neutron-service',
+  }
+
+  # Set OVS manager so that metadata agent can connect to Open vSwitch
+  include ::stdlib
+  $conn_info = split($ovsdb_connection, ":")
+  $proto = $conn_info[0]
+  $addr = $conn_info[1]
+
+  if size($conn_info) == 3 {
+    $port = $conn_info[2]
+    $manager = "p${proto}:${port}:${addr}"
+  } else {
+    $manager = "p${proto}:${addr}"
+  }
+
+  exec { 'Set OVS Manager':
+    command => "ovs-vsctl --timeout=5 --id=@manager -- create Manager target=\\\"${manager}\\\" -- add Open_vSwitch . manager_options @manager",
+    unless  => "ovs-vsctl show | grep \"${manager}\"",
+    path    => '/usr/sbin:/usr/bin:/sbin:/bin',
+    notify  => Service['ovn-metadata'],
   }
 }
